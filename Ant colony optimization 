@@ -1,0 +1,142 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyM/qHaMxoIk4apQTpL8HIgV",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Chiranth099/BIS_LAB/blob/main/Ant%20colony%20optimization%20\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "nYC5LB6oeuhN",
+        "outputId": "ec2d45af-289b-47e4-dc86-06daa12f5a1c"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Best Path: ['ATCG', 'CGTA', 'TAGC', 'GCTA']\n",
+            "Minimum Cost: 6\n",
+            "Reconstructed DNA: ATCGTAGCTA\n"
+          ]
+        }
+      ],
+      "source": [
+        "\n",
+        "import random\n",
+        "\n",
+        "# DNA fragments\n",
+        "dna = [\"ATCG\", \"CGTA\", \"TAGC\", \"GCTA\"]\n",
+        "\n",
+        "n = len(dna)\n",
+        "\n",
+        "# Calculate distance using overlap\n",
+        "distance = [[0] * n for _ in range(n)]\n",
+        "\n",
+        "for i in range(n):\n",
+        "    for j in range(n):\n",
+        "        if i != j:\n",
+        "            overlap = 0\n",
+        "            for k in range(1, min(len(dna[i]), len(dna[j])) + 1):\n",
+        "                if dna[i][-k:] == dna[j][:k]:\n",
+        "                    overlap = k\n",
+        "            distance[i][j] = len(dna[j]) - overlap\n",
+        "\n",
+        "# Initialize pheromones\n",
+        "pheromone = [[1.0] * n for _ in range(n)]\n",
+        "\n",
+        "# ACO parameters\n",
+        "ants = 5\n",
+        "iterations = 20\n",
+        "evaporation = 0.5\n",
+        "best_path = None\n",
+        "best_cost = float('inf')\n",
+        "\n",
+        "# ACO algorithm\n",
+        "for _ in range(iterations):\n",
+        "\n",
+        "    for ant in range(ants):\n",
+        "\n",
+        "        path = [random.randrange(n)]\n",
+        "\n",
+        "        while len(path) < n:\n",
+        "            current = path[-1]\n",
+        "            unvisited = [i for i in range(n) if i not in path]\n",
+        "\n",
+        "            probabilities = [\n",
+        "                pheromone[current][j] /\n",
+        "                (distance[current][j] + 1)\n",
+        "                for j in unvisited\n",
+        "            ]\n",
+        "\n",
+        "            next_city = random.choices(\n",
+        "                unvisited, weights=probabilities\n",
+        "            )[0]\n",
+        "\n",
+        "            path.append(next_city)\n",
+        "\n",
+        "        cost = sum(\n",
+        "            distance[path[i]][path[i+1]]\n",
+        "            for i in range(n-1)\n",
+        "        )\n",
+        "\n",
+        "        if cost < best_cost:\n",
+        "            best_cost = cost\n",
+        "            best_path = path[:]\n",
+        "\n",
+        "    # Update pheromones\n",
+        "    for i in range(n):\n",
+        "        for j in range(n):\n",
+        "            pheromone[i][j] *= (1 - evaporation)\n",
+        "\n",
+        "    for i in range(n - 1):\n",
+        "        a, b = best_path[i], best_path[i+1]\n",
+        "        pheromone[a][b] += 1 / (best_cost + 1)\n",
+        "\n",
+        "# Reconstruct DNA sequence\n",
+        "result = dna[best_path[0]]\n",
+        "\n",
+        "for i in range(1, n):\n",
+        "    previous = dna[best_path[i-1]]\n",
+        "    current = dna[best_path[i]]\n",
+        "\n",
+        "    overlap = 0\n",
+        "    for k in range(1, min(len(previous), len(current)) + 1):\n",
+        "        if previous[-k:] == current[:k]:\n",
+        "            overlap = k\n",
+        "\n",
+        "    result += current[overlap:]\n",
+        "\n",
+        "print(\"Best Path:\", [dna[i] for i in best_path])\n",
+        "print(\"Minimum Cost:\", best_cost)\n",
+        "print(\"Reconstructed DNA:\", result)\n"
+      ]
+    }
+  ]
+}
