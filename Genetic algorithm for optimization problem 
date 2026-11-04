@@ -1,0 +1,118 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyNaZhbpZFE35sF5G6zAhXHt",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Chiranth099/BIS_LAB/blob/main/Genetic%20algorithm%20for%20optimization%20problem%20\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "import random\n",
+        "\n",
+        "# Initialize parameters\n",
+        "POPULATION_SIZE = 6\n",
+        "GENERATIONS = 20\n",
+        "MUTATION_RATE = 0.1\n",
+        "\n",
+        "# Generate random population\n",
+        "# Each individual = [Attack, Defence, Speed]\n",
+        "population = [\n",
+        "    [random.randint(0, 100) for _ in range(3)]\n",
+        "    for _ in range(POPULATION_SIZE)\n",
+        "]\n",
+        "\n",
+        "# Fitness function\n",
+        "def fitness(individual):\n",
+        "    attack, defence, speed = individual\n",
+        "    return 0.4 * attack + 0.3 * defence + 0.3 * speed\n",
+        "\n",
+        "# Selection\n",
+        "def selection(population):\n",
+        "    population.sort(key=fitness, reverse=True)\n",
+        "    return population[:2]\n",
+        "\n",
+        "# Crossover\n",
+        "def crossover(parent1, parent2):\n",
+        "    child = []\n",
+        "    for i in range(3):\n",
+        "        child.append(random.choice([parent1[i], parent2[i]]))\n",
+        "    return child\n",
+        "\n",
+        "# Mutation\n",
+        "def mutation(child):\n",
+        "    for i in range(3):\n",
+        "        if random.random() < MUTATION_RATE:\n",
+        "            child[i] = random.randint(0, 100)\n",
+        "    return child\n",
+        "\n",
+        "# Genetic Algorithm\n",
+        "for generation in range(GENERATIONS):\n",
+        "\n",
+        "    parents = selection(population)\n",
+        "\n",
+        "    new_population = parents.copy()\n",
+        "\n",
+        "    while len(new_population) < POPULATION_SIZE:\n",
+        "        child = crossover(parents[0], parents[1])\n",
+        "        child = mutation(child)\n",
+        "        new_population.append(child)\n",
+        "\n",
+        "    population = new_population\n",
+        "\n",
+        "# Find best AI opponent\n",
+        "best = max(population, key=fitness)\n",
+        "\n",
+        "# Display result\n",
+        "print(\"Best AI Opponent Behaviour\")\n",
+        "print(\"Attack:\", best[0])\n",
+        "print(\"Defence:\", best[1])\n",
+        "print(\"Speed:\", best[2])\n",
+        "print(\"Fitness Score:\", fitness(best))\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "3SW4WgmckWEE",
+        "outputId": "6f407ec7-de0a-4f1a-bb2d-ae415b456ab2"
+      },
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Best AI Opponent Behaviour\n",
+            "Attack: 95\n",
+            "Defence: 74\n",
+            "Speed: 97\n",
+            "Fitness Score: 89.3\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
